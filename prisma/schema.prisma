@@ -1,0 +1,289 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  role      String   @default("customer")
+  createdAt DateTime @default(now())
+  
+  sessions  Session[]
+  orders    Order[]
+  addresses Address[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  
+  store     Store?
+  theme     Theme?
+  seo       Seo?
+  shipping  Shipping?
+  payments  Payments?
+  social    Social?
+}
+
+model Store {
+  id        String   @id @default(cuid())
+  name      String
+  logo      String?
+  phone     String?
+  email     String?
+  address   String?
+  
+  settingId String?  @unique
+  setting   Setting? @relation(fields: [settingId], references: [id])
+}
+
+model Theme {
+  id           String  @id @default(cuid())
+  primary      String  @default("#2563eb")
+  secondary    String  @default("#64748b")
+  bg           String  @default("#ffffff")
+  text         String  @default("#0f172a")
+  btn          String  @default("#2563eb")
+  discount     String  @default("#dc2626")
+  radius       Int     @default(12)
+  font         String  @default("Tajawal")
+  headerStyle  String  @default("default")
+  footerStyle  String  @default("default")
+  
+  settingId    String? @unique
+  setting      Setting? @relation(fields: [settingId], references: [id])
+}
+
+model Seo {
+  id              String  @id @default(cuid())
+  siteTitle       String
+  metaDescription String?
+  keywords        String?
+  
+  settingId       String? @unique
+  setting         Setting? @relation(fields: [settingId], references: [id])
+}
+
+model Shipping {
+  id                   String   @id @default(cuid())
+  defaultFee           Float    @default(15)
+  freeShippingEnabled  Boolean  @default(false)
+  freeShippingMin      Float    @default(200)
+  
+  settingId            String?  @unique
+  setting              Setting? @relation(fields: [settingId], references: [id])
+  cities               City[]
+}
+
+model City {
+  id        String   @id @default(cuid())
+  name      String
+  fee       Float
+  duration  String?
+  
+  shippingId String
+  shipping   Shipping @relation(fields: [shippingId], references: [id], onDelete: Cascade)
+}
+
+model Payments {
+  id        String  @id @default(cuid())
+  cod       Json    @default("{\"enabled\": true, \"label\": \"الدفع عند الاستلام\"}")
+  bank      Json    @default("{\"enabled\": false, \"label\": \"تحويل بنكي\", \"details\": \"\"}")
+  card      Json    @default("{\"enabled\": false, \"label\": \"بطاقة ائتمان\"}")
+  
+  settingId String? @unique
+  setting   Setting? @relation(fields: [settingId], references: [id])
+}
+
+model Social {
+  id        String  @id @default(cuid())
+  facebook  String?
+  twitter   String?
+  instagram String?
+  snapchat  String?
+  tiktok    String?
+  
+  settingId String? @unique
+  setting   Setting? @relation(fields: [settingId], references: [id])
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  nameAr    String
+  nameEn    String?
+  slug      String    @unique
+  isActive  Boolean   @default(true)
+  order     Int       @default(0)
+  
+  products  Product[]
+}
+
+model Brand {
+  id        String    @id @default(cuid())
+  name      String
+  logo      String?
+  isActive  Boolean   @default(true)
+  
+  products  Product[]
+}
+
+model Product {
+  id              String    @id @default(cuid())
+  nameAr          String
+  nameEn          String?
+  slug            String    @unique
+  description     String?
+  price           Float
+  oldPrice        Float?
+  stock           Int       @default(0)
+  sku             String?
+  status          String    @default("active")
+  isFeatured      Boolean   @default(false)
+  isNew           Boolean   @default(false)
+  isOnSale        Boolean   @default(false)
+  discount        Int       @default(0)
+  salesCount      Int       @default(0)
+  rating          Float?
+  tags            String?
+  colors          Json?
+  specifications  Json?
+  seoTitle        String?
+  seoDescription  String?
+  createdAt       DateTime  @default(now())
+  
+  categoryId      String
+  category        Category  @relation(fields: [categoryId], references: [id])
+  brandId         String?
+  brand           Brand?    @relation(fields: [brandId], references: [id])
+  
+  images          ProductImage[]
+  reviews         Review[]
+  orderItems      OrderItem[]
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  url       String
+  isMain    Boolean @default(false)
+  order     Int     @default(0)
+  
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  name       String
+  rating     Int
+  comment    String?
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id               String    @id @default(cuid())
+  number           String    @unique
+  status           String    @default("new")
+  subtotal         Float
+  discount         Float     @default(0)
+  shipping         Float     @default(0)
+  total            Float
+  paymentMethod    String
+  customerName     String
+  customerPhone    String
+  customerEmail    String?
+  shippingCity     String
+  shippingAddress  String
+  shippingNotes    String?
+  createdAt        DateTime  @default(now())
+  
+  userId           String?
+  user             User?     @relation(fields: [userId], references: [id])
+  
+  items            OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  qty       Int
+  price     Float
+  
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  title     String
+  city      String
+  district  String?
+  street    String
+  phone     String
+  
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Coupon {
+  id           String    @id @default(cuid())
+  code         String    @unique
+  type         String    @default("percentage")
+  value        Float
+  minAmount    Float?
+  maxDiscount  Float?
+  isActive     Boolean   @default(true)
+  startsAt     DateTime?
+  endsAt       DateTime?
+}
+
+model Page {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  content         String
+  isActive        Boolean  @default(true)
+  seoTitle        String?
+  seoDescription  String?
+}
+
+model HomeSection {
+  id        String   @id @default(cuid())
+  type      String
+  title     String?
+  config    Json?
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+}
+
+model Banner {
+  id        String    @id @default(cuid())
+  image     String
+  link      String?
+  isActive  Boolean   @default(true)
+  order     Int       @default(0)
+  startsAt  DateTime?
+  endsAt    DateTime?
+}
