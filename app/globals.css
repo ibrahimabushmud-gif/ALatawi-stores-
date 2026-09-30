@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: var(--bg, #ffffff);
+  color: var(--text, #0f172a);
+}
+
+.container-x {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.card {
+  background: white;
+  border-radius: var(--radius, 12px);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px solid #f1f5f9;
+}
+
+.card-flat {
+  background: #f8fafc;
+  border-radius: var(--radius, 12px);
+  border: 1px solid #e2e8f0;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: var(--radius, 12px);
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  font-family: 'Tajawal', sans-serif;
+}
+
+.btn-primary { background: var(--primary, #2563eb); color: white; }
+.btn-primary:hover { opacity: 0.9; }
+.btn-outline { background: transparent; border: 2px solid var(--primary, #2563eb); color: var(--primary, #2563eb); }
+.btn-gray { background: #f1f5f9; color: #475569; }
+.btn-danger { background: #dc2626; color: white; }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius, 12px);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 14px;
+}
+.input:focus { outline: none; border-color: var(--primary, #2563eb); }
+
+.label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #475569; }
+.price { color: var(--primary, #2563eb); font-weight: 800; }
+.price-old { color: #94a3b8; text-decoration: line-through; }
+
+.badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.badge-discount { background: var(--discount, #dc2626); color: white; }
+.badge-gray { background: #f1f5f9; color: #64748b; }
+
+.table { width: 100%; border-collapse: collapse; }
+.table td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
