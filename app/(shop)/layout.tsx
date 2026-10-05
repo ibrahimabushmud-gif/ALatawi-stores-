@@ -9,7 +9,18 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
     where: { isActive: true }, orderBy: { order: "asc" },
   });
   const pages = await db.page.findMany({ where: { isActive: true } });
-  const t = settings.theme;
+  const t = settings.theme || {
+    primary: "#2563eb",
+    secondary: "#1e40af",
+    bg: "#ffffff",
+    text: "#0f172a",
+    btn: "#2563eb",
+    discount: "#dc2626",
+    radius: 12,
+    font: "Tajawal",
+    headerStyle: "default",
+    footerStyle: "default",
+  };
   const vars: any = {
     "--primary": t.primary, "--secondary": t.secondary, "--bg": t.bg,
     "--text": t.text, "--btn": t.btn, "--discount": t.discount,
@@ -19,10 +30,10 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
   };
   return (
     <div style={vars}>
-      <Header store={settings.store} categories={categories} headerStyle={t.headerStyle} />
+      <Header store={settings.store} categories={categories} headerStyle={t.headerStyle || "default"} />
       <main style={{ minHeight: "60vh" }}>{children}</main>
       <Footer store={settings.store} categories={categories} pages={pages}
-        social={settings.social} footerStyle={t.footerStyle} />
+        social={settings.social} footerStyle={t.footerStyle || "default"} />
     </div>
   );
 }
